@@ -1,0 +1,71 @@
+{
+	"name": "taro-script",
+	"version": "0.1.0",
+	"description": "For Taro v3：支持多端小程序动态加载 script",
+	"main": "cjs/index.js",
+	"module": "esm/index.js",
+	"types": "lib/index.d.ts",
+	"files": [
+		"cjs",
+		"esm",
+		"lib",
+		"*.md"
+	],
+	"scripts": {
+		"start": "tsc -w",
+		"cjs": "transform-es src -d cjs -c -t cjs",
+		"esm": "transform-es src -d esm -c -t esm",
+		"tsc": "tsc",
+		"test": "jest",
+		"clear": "rimraf lib cjs esm docs dist",
+		"build": "run-s clear tsc cjs esm"
+	},
+	"dependencies": {
+		"@tarojs/taro": "^3.0.9",
+		"react": "^16.13.1",
+		"eval5": "^1.4.5"
+	},
+	"devDependencies": {
+		"@types/enzyme": "^3.10.5",
+		"@types/enzyme-adapter-react-16": "^1.0.6",
+		"@types/react": "^16.9.34",
+		"@types/react-dom": "^16.9.8",
+		"@types/vue": "^2.0.0",
+		"babel-plugin-search-and-replace": "^1.0.1",
+		"babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+		"enzyme": "^3.11.0",
+		"enzyme-adapter-react-16": "^1.15.2",
+		"jest": "^25.4.0",
+		"npm-run-all": "^4.1.5",
+		"packez": "^4.1.3",
+		"react-dom": "^16.13.1",
+		"rimraf": "^3.0.2",
+		"transform-es": "^5.0.4",
+		"typescript": "^3.8.3"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bplok20010/taro-script.git"
+	},
+	"keywords": [
+		"taro",
+		"taro-ui",
+		"taro-script",
+		"eval5"
+	],
+	"author": "nobo.zhou<nobo.zhou@foxmail.com>",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/bplok20010/taro-script/issues"
+	},
+	"homepage": "https://github.com/bplok20010/taro-script#readme",
+	"browserslist": [
+		">=0.25%",
+		"not dead",
+		"not op_mini all",
+		"not Android 4.4.3-4.4.4",
+		"not ios_saf < 10",
+		"not Chrome < 50",
+		"firefox ESR"
+	]
+}
