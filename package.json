@@ -1,6 +1,6 @@
 {
 	"name": "taro-script",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "For Taro v3：支持多端小程序动态加载 script",
 	"main": "cjs/index.js",
 	"module": "esm/index.js",

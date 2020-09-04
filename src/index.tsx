@@ -20,6 +20,7 @@ export interface TaroScriptProps {
 	timeout?: number;
 	/** 脚本加载中显示内容 */
 	fallback?: React.ReactNode;
+	children?: React.ReactNode;
 }
 
 export const TaroScript: React.FC<TaroScriptProps> = function TaroScript(props) {
@@ -66,6 +67,8 @@ TaroScript.displayName = "TaroScript";
 
 TaroScript.defaultProps = {
 	context: Object.create(null),
+	children: null,
+	fallback: null,
 };
 
 export default TaroScript;
