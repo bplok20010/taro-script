@@ -18,70 +18,78 @@ const rootContext = {
 	cancelAnimationFrame,
 };
 
-export const globalScope = {};
+export const globalContext = {};
 
 export const version = "%VERSION%";
 
-function wrapScope<T extends Record<any, any>>(
-	scope: T
+function wrapContext<T extends Record<any, any>>(
+	context: T
 ): T & {
 	__loadCache: {};
 } {
-	if (!scope.__loadCache) {
-		Object.defineProperty(scope, "__loadCache", {
+	if (!context.__loadCache) {
+		Object.defineProperty(context, "__loadCache", {
 			value: Object.create(null),
 			enumerable: false,
 		});
 	}
-	return scope as any;
+	return context as any;
 }
 
 export interface TaroScriptProps<T = Record<any, any>> {
 	/** 脚本执行根作用域及上下文环境 */
-	scope?: T;
+	context?: T;
 	/** 脚本路径 */
 	src?: string | string[];
+	/** JavaScript字符串代码 */
+	text?: string;
 	/** 脚本加载并执行完后回调 */
 	onLoad?: (props: TaroScriptProps) => void;
 	/** 脚本加载失败后回调 */
 	onError?: (err: Error, props: TaroScriptProps) => void;
+	onExecSuccess?: () => void;
+	onExecError?: (err: Error) => void;
 	/** 加载脚本超时时间 */
 	timeout?: number;
 	/** 脚本加载中显示内容 */
 	fallback?: React.ReactNode;
 	useCache?: boolean;
-	children?: React.ReactNode | ((scope: T) => React.ReactNode);
+	/** 预留 */
+	type?: string;
+	children?: React.ReactNode | ((context: T) => React.ReactNode);
 }
 
-function evalScript<T>(scope: T, code: string) {
+export function evalScript<T extends Record<any, any>>(code: string, context?: T) {
 	if (!code) return;
 
-	const interpreter = new Interpreter(scope, {
+	const interpreter = new Interpreter(context || globalContext, {
 		timeout: SCRIPT_EXEC_TIMEOUT,
 		rootContext: rootContext,
-		globalContextInFunction: scope,
+		globalContextInFunction: context || globalContext,
 	});
 
 	interpreter.evaluate(code);
+
+	return interpreter.getValue();
 }
 
 function loadScript<
 	T extends {
 		__loadCache: {};
 	}
->(scope: T, requestOpts: request.Option, useCache = true) {
+>(context: T, requestOpts: request.Option, useCache = true) {
 	const url = requestOpts.url;
 
 	return new Promise<string>((resolve, reject) => {
-		if (useCache && url in scope.__loadCache) {
-			resolve(scope.__loadCache[url]);
+		if (useCache && url in context.__loadCache) {
+			resolve(context.__loadCache[url]);
 			return;
 		}
 
 		request(
 			Object.assign({}, requestOpts, {
 				success(res: request.SuccessCallbackResult<string>) {
-					resolve((scope.__loadCache[url] = res.data));
+					resolve((context.__loadCache[url] = res.data));
 				},
 				fail(err: { errMsg: string }) {
 					reject(new Error(err.errMsg));
@@ -92,14 +100,32 @@ function loadScript<
 }
 
 export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
-	const scopeRef = React.useRef(wrapScope(props.scope || globalScope));
+	const contextRef = React.useRef(wrapContext(props.context || globalContext));
 	const result = React.useState<typeof PENDING | typeof COMPLETED>(PENDING);
 	const loadStatus = result[0],
 		setLoadStatus = result[1];
 
 	React.useEffect(() => {
-		const scope = scopeRef.current;
-		const { src, timeout, onLoad, onError, useCache } = props;
+		const context = contextRef.current;
+		const { src, timeout, onLoad, onError, onExecError, onExecSuccess, useCache, text } = props;
+
+		if (text) {
+			try {
+				evalScript(text, context);
+
+				if (onExecSuccess) {
+					onExecSuccess();
+				}
+
+				setLoadStatus(COMPLETED);
+			} catch (e) {
+				if (onExecError) {
+					onExecError(e);
+				}
+			}
+			return;
+		}
+
 		if (!src) {
 			return;
 		}
@@ -108,7 +134,7 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 
 		const promises = scriptUrls.map((url) => {
 			return loadScript(
-				scope,
+				context,
 				{
 					url,
 					timeout,
@@ -122,15 +148,31 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 
 		Promise.all(promises)
 			.then((codes) => {
-				codes.forEach((code) => {
-					evalScript(scope, code);
-				});
-
-				if (onLoad) {
-					onLoad(props);
+				let execErr: Error | null = null;
+				try {
+					codes.forEach((code) => {
+						evalScript(code, context);
+					});
+				} catch (e) {
+					execErr = e;
+					if (onExecError) {
+						onExecError(e);
+					}
 				}
 
-				setLoadStatus(COMPLETED);
+				if (!execErr) {
+					if (onExecSuccess) {
+						onExecSuccess();
+					}
+
+					if (onLoad) {
+						onLoad(props);
+					}
+
+					setLoadStatus(COMPLETED);
+				} else {
+					throw execErr;
+				}
 			})
 			.catch((err) => {
 				if (onError) {
@@ -145,6 +187,7 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 TaroScript.displayName = "TaroScript";
 
 TaroScript.defaultProps = {
+	timeout: 10000,
 	useCache: true,
 	children: null,
 	fallback: null,

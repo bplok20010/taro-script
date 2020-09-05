@@ -1,7 +1,7 @@
 {
 	"name": "taro-script",
-	"version": "0.1.1",
-	"description": "For Taro v3：支持多端小程序动态加载 script",
+	"version": "0.2.0",
+	"description": "For Taro v3：支持多端小程序动态加载远程 JavaScript 脚本并执行",
 	"main": "cjs/index.js",
 	"module": "esm/index.js",
 	"types": "lib/index.d.ts",
@@ -53,7 +53,7 @@
 		"taro-script",
 		"eval5"
 	],
-	"author": "nobo.zhou<nobo.zhou@foxmail.com>",
+	"author": "nobo<nobo.zhou@foxmail.com>",
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/bplok20010/taro-script/issues"
