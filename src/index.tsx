@@ -18,7 +18,7 @@ const rootContext = {
 	cancelAnimationFrame,
 };
 
-export const globalContext = {};
+export const globalContext: Record<any, any> = {};
 
 export const version = "%VERSION%";
 
@@ -181,7 +181,11 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 			});
 	}, []);
 
-	return (loadStatus === COMPLETED ? props.children : props.fallback) as React.ReactElement;
+	return (loadStatus === COMPLETED
+		? typeof props.children === "function"
+			? props.children(contextRef.current)
+			: props.children
+		: props.fallback) as React.ReactElement;
 }
 
 TaroScript.displayName = "TaroScript";
