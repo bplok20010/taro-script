@@ -20,6 +20,10 @@ const rootContext = {
 
 export const globalContext: Record<any, any> = {};
 
+const ScriptContext = React.createContext({
+	context: globalContext,
+});
+
 export const version = "%VERSION%";
 
 function wrapContext<T extends Record<any, any>>(
@@ -97,6 +101,10 @@ function loadScript<
 			})
 		);
 	});
+}
+
+export function useScriptContext<T = Record<any, any>>(): T {
+	return React.useContext(ScriptContext).context;
 }
 
 export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
@@ -181,11 +189,19 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 			});
 	}, []);
 
-	return (loadStatus === COMPLETED
-		? typeof props.children === "function"
-			? props.children(contextRef.current)
-			: props.children
-		: props.fallback) as React.ReactElement;
+	return (
+		<ScriptContext.Provider
+			value={{
+				context: contextRef.current,
+			}}
+		>
+			{loadStatus === COMPLETED
+				? typeof props.children === "function"
+					? props.children(contextRef.current)
+					: props.children
+				: props.fallback}
+		</ScriptContext.Provider>
+	);
 }
 
 TaroScript.displayName = "TaroScript";

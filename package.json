@@ -1,6 +1,6 @@
 {
 	"name": "taro-script",
-	"version": "0.2.1",
+	"version": "0.3.0",
 	"description": "For Taro v3：支持多端小程序动态加载远程 JavaScript 脚本并执行",
 	"main": "cjs/index.js",
 	"module": "esm/index.js",

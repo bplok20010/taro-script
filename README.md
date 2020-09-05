@@ -107,9 +107,26 @@ import TaroScript, { globalContext } from "taro-script";
 
 ### `children`
 
-类型：`React.ReactNode | ((scope: T) => React.ReactNode)`
+类型：`React.ReactNode | ((context: T) => React.ReactNode)`
 
 加载完成后显示的内容，支持传入`函数`第一个参数为脚本执行的`作用域`
+
+## `useScriptContext()`
+
+获取当前执行上下文 hook
+
+```ts
+import TaroScript, { useScriptContext } from "taro-script";
+
+<TaroScript text="var a= 100">
+	<Test />
+</TaroScript>;
+
+function Test() {
+	const ctx = useScriptContext();
+	return ctx.a; // 100
+}
+```
 
 ## `evalScript(code: string, context?: {})`
 
@@ -153,4 +170,75 @@ declare const globalContext: {};
 
 ## 其他
 
-该组件使用[eval5](https://github.com/bplok20010/eval5)来解析`JavaScript`
+- 该组件使用[eval5](https://github.com/bplok20010/eval5)来解析`JavaScript`
+
+- TaroScript 内置类型及方法：
+
+```ts
+  NaN,
+	Infinity,
+	undefined,
+	null,
+	Object,
+	Array,
+	String,
+	Boolean,
+	Number,
+	Date,
+	RegExp,
+	Error,
+	URIError,
+	TypeError,
+	RangeError,
+	SyntaxError,
+	ReferenceError,
+	Math,
+	parseInt,
+	parseFloat,
+	isNaN,
+	isFinite,
+	decodeURI,
+	decodeURIComponent,
+	encodeURI,
+	encodeURIComponent,
+	escape,
+	unescape,
+	eval,
+  Function,
+  console,
+	setTimeout,
+	clearTimeout,
+	setInterval,
+	clearInterval,
+	requestAnimationFrame,
+	cancelAnimationFrame,
+```
+
+> 内置类型和当前运行 JavaScript 环境相关，如环境本身不支持则不支持！
+
+导入自定义方法或类型示例：
+
+```ts
+import TaroScript, { globalContext } from "taro-script";
+
+globalContext.hello = function(){
+  console.log('hello taro-script')
+}
+
+<TaroScript text="hello()"></TaroScript>;
+```
+
+或
+
+```ts
+import TaroScript, { globalContext } from "taro-script";
+
+const ctx = {
+  hello(){
+    console.log('hello taro-script')
+  }
+}
+
+<TaroScript context={ctx} text="hello()"></TaroScript>;
+
+```
