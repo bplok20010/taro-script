@@ -228,10 +228,10 @@ globalContext.hello = function(){
 <TaroScript text="hello()"></TaroScript>;
 ```
 
-或
+或自定义上下文
 
 ```ts
-import TaroScript, { globalContext } from "taro-script";
+import TaroScript from "taro-script";
 
 const ctx = {
   hello(){
