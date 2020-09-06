@@ -14,8 +14,6 @@ const rootContext = {
 	clearTimeout,
 	setInterval,
 	clearInterval,
-	requestAnimationFrame,
-	cancelAnimationFrame,
 };
 
 export const globalContext: Record<any, any> = {};

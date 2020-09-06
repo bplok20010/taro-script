@@ -228,8 +228,6 @@ setTimeout,
 clearTimeout,
 setInterval,
 clearInterval,
-requestAnimationFrame,
-cancelAnimationFrame,
 ```
 
 > 内置类型和当前运行 JavaScript 环境相关，如环境本身不支持则不支持！
