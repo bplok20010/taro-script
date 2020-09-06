@@ -1,6 +1,6 @@
 # taro-script
 
-**For Taro v3**：支持多端小程序动态加载远程 JavaScript 脚本并执行，**当前 JavaScript 解释器只支持 ES5 语法**
+**For Taro v3**：支持多端小程序动态加载远程 JavaScript 脚本并执行，**支持 ES5 语法**
 
 ## Usage
 
