@@ -1,42 +1,16 @@
 import React from "react";
-import { request } from "@tarojs/taro";
-import { Interpreter } from "eval5";
+import { globalContext, evalScript, loadScript } from "./utils";
+
+export { evalScript, globalContext };
 
 const PENDING = 0;
 const COMPLETED = 1;
-
-const SCRIPT_EXEC_TIMEOUT = 600000;
-
-// 基本方法注入
-const rootContext = {
-	console,
-	setTimeout,
-	clearTimeout,
-	setInterval,
-	clearInterval,
-};
-
-export const globalContext: Record<any, any> = {};
 
 const ScriptContext = React.createContext({
 	context: globalContext,
 });
 
 export const version = "%VERSION%";
-
-function wrapContext<T extends Record<any, any>>(
-	context: T
-): T & {
-	__loadCache: {};
-} {
-	if (!context.__loadCache) {
-		Object.defineProperty(context, "__loadCache", {
-			value: Object.create(null),
-			enumerable: false,
-		});
-	}
-	return context as any;
-}
 
 export interface TaroScriptProps<T = Record<any, any>> {
 	/** 脚本执行根作用域及上下文环境 */
@@ -55,50 +29,11 @@ export interface TaroScriptProps<T = Record<any, any>> {
 	timeout?: number;
 	/** 脚本加载中显示内容 */
 	fallback?: React.ReactNode;
-	useCache?: boolean;
+	/** 使用加载缓存 */
+	cache?: boolean;
 	/** 预留 */
 	type?: string;
 	children?: React.ReactNode | ((context: T) => React.ReactNode);
-}
-
-export function evalScript<T extends Record<any, any>>(code: string, context?: T) {
-	if (!code) return;
-
-	const interpreter = new Interpreter(context || globalContext, {
-		timeout: SCRIPT_EXEC_TIMEOUT,
-		rootContext: rootContext,
-		globalContextInFunction: context || globalContext,
-	});
-
-	interpreter.evaluate(code);
-
-	return interpreter.getValue();
-}
-
-function loadScript<
-	T extends {
-		__loadCache: {};
-	}
->(context: T, requestOpts: request.Option, useCache = true) {
-	const url = requestOpts.url;
-
-	return new Promise<string>((resolve, reject) => {
-		if (useCache && url in context.__loadCache) {
-			resolve(context.__loadCache[url]);
-			return;
-		}
-
-		request(
-			Object.assign({}, requestOpts, {
-				success(res: request.SuccessCallbackResult<string>) {
-					resolve((context.__loadCache[url] = res.data));
-				},
-				fail(err: { errMsg: string }) {
-					reject(new Error(err.errMsg));
-				},
-			})
-		);
-	});
 }
 
 export function useScriptContext<T = Record<any, any>>(): T {
@@ -106,14 +41,14 @@ export function useScriptContext<T = Record<any, any>>(): T {
 }
 
 export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
-	const contextRef = React.useRef(wrapContext(props.context || globalContext));
+	const contextRef = React.useRef(props.context || globalContext);
 	const result = React.useState<typeof PENDING | typeof COMPLETED>(PENDING);
 	const loadStatus = result[0],
 		setLoadStatus = result[1];
 
 	React.useEffect(() => {
 		const context = contextRef.current;
-		const { src, timeout, onLoad, onError, onExecError, onExecSuccess, useCache, text } = props;
+		const { src, timeout, onLoad, onError, onExecError, onExecSuccess, cache, text } = props;
 
 		if (text) {
 			try {
@@ -140,7 +75,6 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 
 		const promises = scriptUrls.map((url) => {
 			return loadScript(
-				context,
 				{
 					url,
 					timeout,
@@ -148,7 +82,7 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 					credentials: "include",
 					method: "GET",
 				},
-				useCache
+				cache
 			);
 		});
 
@@ -206,7 +140,7 @@ TaroScript.displayName = "TaroScript";
 
 TaroScript.defaultProps = {
 	timeout: 10000,
-	useCache: true,
+	cache: true,
 	children: null,
 	fallback: null,
 };

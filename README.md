@@ -84,7 +84,7 @@ const app = getApp();
 
 **此时 `app.value` 的值为 `100`**
 
-## `TaroScript 属性`
+## `TaroScript` 属性
 
 - ### `src`
 
@@ -143,7 +143,7 @@ const app = getApp();
 
   脚本加载中、加载失败、执行失败的显示内容
 
-- ### `useCache`
+- ### `cache`
 
   类型：`boolean`
 
@@ -280,7 +280,7 @@ interface TaroScriptProps<T = Record<any, any>> {
 	/** 脚本加载中显示内容 */
 	fallback?: React.ReactNode;
 	/** 启用缓存 */
-	useCache?: boolean;
+	cache?: boolean;
 	children?: React.ReactNode | ((context: T) => React.ReactNode);
 }
 
