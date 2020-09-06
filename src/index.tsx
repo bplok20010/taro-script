@@ -48,9 +48,9 @@ export interface TaroScriptProps<T = Record<any, any>> {
 	/** JavaScript字符串代码 */
 	text?: string;
 	/** 脚本加载并执行完后回调 */
-	onLoad?: (props: TaroScriptProps) => void;
+	onLoad?: () => void;
 	/** 脚本加载失败后回调 */
-	onError?: (err: Error, props: TaroScriptProps) => void;
+	onError?: (err: Error) => void;
 	onExecSuccess?: () => void;
 	onExecError?: (err: Error) => void;
 	/** 加载脚本超时时间 */
@@ -174,7 +174,7 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 					}
 
 					if (onLoad) {
-						onLoad(props);
+						onLoad();
 					}
 
 					setLoadStatus(COMPLETED);
@@ -184,7 +184,7 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 			})
 			.catch((err) => {
 				if (onError) {
-					onError(err, props);
+					onError(err);
 				}
 			});
 	}, []);

@@ -1,6 +1,6 @@
 # taro-script
 
-For Taro v3：支持多端小程序动态加载远程 JavaScript 脚本并执行，**当前 JavaScript 解释器只支持 ES5 语法**
+**For Taro v3**：支持多端小程序动态加载远程 JavaScript 脚本并执行，**当前 JavaScript 解释器只支持 ES5 语法**
 
 ## Usage
 
@@ -8,25 +8,61 @@ For Taro v3：支持多端小程序动态加载远程 JavaScript 脚本并执行
 npm install --save taro-script
 ```
 
-```ts
+```tsx
 import TaroScript from "taro-script";
 
 <TaroScript text="console.log(100+200)" />;
 ```
 
-```ts
+```tsx
 import TaroScript from "taro-script";
 
-<TaroScript context={getApp()} src="https://xxxxx/xx.js">
-	<View>Taro Script</View>
+<TaroScript src="https://xxxxx/xx.js">
+	<View>Hello TaroScript</View>
 </TaroScript>;
 ```
 
-## globalContext
+**注 1**：同一`taro-script`只会执行一次，也就是在`componentDidMount`后执行，后续改变属性是无效的。示例
+
+```tsx
+function App({ url }) {
+	// 只会在第一次创建后加载并执行，后续组件的更新会忽略所有属性变动
+	return <TaroScript src={url} />;
+}
+```
+
+**注 2**：多个`taro-script`会并行加载及无序执行，无法保证顺序。如：
+
+```tsx
+// 并行加载及无序执行
+<TaroScript  src="path1" />
+<TaroScript  src="path2" />
+<TaroScript  src="path3" />
+```
+
+**如需要确保执行顺序，应该使用数组或嵌套，例如：**
+
+**数组方式(建议)**
+
+```tsx
+<TaroScript src={["path1", "path2", "path3"]} />
+```
+
+或 嵌套方式
+
+```tsx
+<TaroScript src="path1">
+	<TaroScript src="path2">
+		<TaroScript src="path3"></TaroScript>
+	</TaroScript>
+</TaroScript>
+```
+
+## `globalContext`
 
 内置的全局执行上下文
 
-```ts
+```tsx
 import TaroScript, { globalContext } from "taro-script";
 
 <TaroScript text="var value = 100" />;
@@ -34,88 +70,96 @@ import TaroScript, { globalContext } from "taro-script";
 
 **此时 `globalContext.value` 的值为 `100`**
 
-## TaroScript 属性
+**自定义`context`示例**
 
-### `src`
+```tsx
+import TaroScript from "taro-script";
 
-类型：`string | string[]`
+const app = getApp();
 
-要加载的远程脚本
-
-### `text`
-
-类型：`string | string[]`
-
-需要执行的 JavaScript 脚本字符串，`text` 优先级高于 `src`
-
-### `context`
-
-类型：`object`
-
-默认值：`globalContext = {}`
-
-执行上下文，默认为`globalContext`，可通过`import {globalContext} from 'taro-script'`获取
-
-```ts
-<TaroScript context={getApp()} />
+<TaroScript context={app} text="var value = 100" />;
 ```
 
-### `timeout`
+**此时 `app.value` 的值为 `100`**
 
-类型：`number`
-默认值：`10000` 毫秒
+## `TaroScript 属性`
 
-设置每个远程脚本加载超时时间
+- ### `src`
 
-### `onExecSuccess`
+  类型：`string | string[]`
 
-类型：`()=> void`
+  要加载的远程脚本
 
-脚本执行成功后回调
+- ### `text`
 
-### `onExecError`
+  类型：`string | string[]`
 
-类型：`(err:Error)=> void`
+  需要执行的 JavaScript 脚本字符串，`text` 优先级高于 `src`
 
-脚本执行错误后回调
+- ### `context`
 
-### `onLoad`
+  类型：`object`
 
-类型：`(props: TaroScriptProps) => void`
+  默认值：`globalContext = {}`
 
-脚本加载完且执行成功后回调
+  执行上下文，默认为`globalContext`
 
-### `onError`
+- ### `timeout`
 
-类型：`(err: Error,props: TaroScriptProps) => void`
+  类型：`number`
+  默认值：`10000` 毫秒
 
-脚本加载失败或脚本执行错误后回调
+  设置每个远程脚本加载超时时间
 
-### `fallback`
+- ### `onExecSuccess`
 
-类型：`React.ReactNode`
+  类型：`()=> void`
 
-脚本加载中、加载失败、执行失败的显示内容
+  脚本执行成功后回调
 
-### `useCache`
+- ### `onExecError`
 
-类型：`boolean`
+  类型：`(err:Error)=> void`
 
-默认值：`true`
+  脚本执行错误后回调
 
-是否启用加载缓存
+- ### `onLoad`
 
-### `children`
+  类型：`() => void`
 
-类型：`React.ReactNode | ((context: T) => React.ReactNode)`
+  脚本加载完且执行成功后回调，`text`存在时无效
 
-加载完成后显示的内容，支持传入`函数`第一个参数为脚本执行的`作用域`
+- ### `onError`
+
+  类型：`(err: Error) => void`
+
+  脚本加载失败或脚本执行错误后回调，`text`存在时无效
+
+- ### `fallback`
+
+  类型：`React.ReactNode`
+
+  脚本加载中、加载失败、执行失败的显示内容
+
+- ### `useCache`
+
+  类型：`boolean`
+
+  默认值：`true`
+
+  是否启用加载缓存，缓存策略是已当前请求地址作为`key`，缓存周期为当前用户在使用应用程序的生命周期。
+
+- ### `children`
+
+  类型：`React.ReactNode | ((context: T) => React.ReactNode)`
+
+  加载完成后显示的内容，支持传入`函数`第一个参数为脚本执行的`作用域`
 
 ## `useScriptContext()`
 
 获取当前执行上下文 hook
 
-```ts
+```tsx
 import TaroScript, { useScriptContext } from "taro-script";
 
 <TaroScript text="var a= 100">
@@ -132,10 +176,85 @@ function Test() {
 
 动态执行给定的字符串脚本，并返回最后一个表达式的值
 
-```ts
+```tsx
 import { evalScript } from "taro-script";
 
-evalScript("100+200");
+const value = evalScript("100+200"); // 300
+```
+
+## 其他
+
+- 该组件使用[eval5](https://github.com/bplok20010/eval5)来解析`JavaScript`语法，支持 `ES5`
+
+- TaroScript 内置类型及方法：
+
+```ts
+NaN,
+Infinity,
+undefined,
+null,
+Object,
+Array,
+String,
+Boolean,
+Number,
+Date,
+RegExp,
+Error,
+URIError,
+TypeError,
+RangeError,
+SyntaxError,
+ReferenceError,
+Math,
+parseInt,
+parseFloat,
+isNaN,
+isFinite,
+decodeURI,
+decodeURIComponent,
+encodeURI,
+encodeURIComponent,
+escape,
+unescape,
+eval,
+Function,
+console,
+setTimeout,
+clearTimeout,
+setInterval,
+clearInterval,
+requestAnimationFrame,
+cancelAnimationFrame,
+```
+
+> 内置类型和当前运行 JavaScript 环境相关，如环境本身不支持则不支持！
+
+导入自定义方法或类型示例：
+
+```tsx
+import TaroScript, { globalContext } from "taro-script";
+
+globalContext.hello = function(){
+  console.log('hello taro-script')
+}
+
+<TaroScript text="hello()"></TaroScript>;
+```
+
+或自定义上下文
+
+```tsx
+import TaroScript from "taro-script";
+
+const ctx = {
+  hello(){
+    console.log('hello taro-script')
+  }
+}
+
+<TaroScript context={ctx} text="hello()"></TaroScript>;
+
 ```
 
 ## Interface
@@ -149,9 +268,9 @@ interface TaroScriptProps<T = Record<any, any>> {
 	/** JavaScript字符串代码 */
 	text?: string;
 	/** 脚本加载并执行完后回调 */
-	onLoad?: (props: TaroScriptProps) => void;
+	onLoad?: () => void;
 	/** 脚本加载失败后回调 */
-	onError?: (err: Error, props: TaroScriptProps) => void;
+	onError?: (err: Error) => void;
 	onExecSuccess?: () => void;
 	onExecError?: (err: Error) => void;
 	/** 加载脚本超时时间 */
@@ -166,79 +285,5 @@ interface TaroScriptProps<T = Record<any, any>> {
 declare function evalScript<T extends Record<any, any>>(code: string, context?: T): any;
 
 declare const globalContext: {};
-```
-
-## 其他
-
-- 该组件使用[eval5](https://github.com/bplok20010/eval5)来解析`JavaScript`
-
-- TaroScript 内置类型及方法：
-
-```ts
-  NaN,
-	Infinity,
-	undefined,
-	null,
-	Object,
-	Array,
-	String,
-	Boolean,
-	Number,
-	Date,
-	RegExp,
-	Error,
-	URIError,
-	TypeError,
-	RangeError,
-	SyntaxError,
-	ReferenceError,
-	Math,
-	parseInt,
-	parseFloat,
-	isNaN,
-	isFinite,
-	decodeURI,
-	decodeURIComponent,
-	encodeURI,
-	encodeURIComponent,
-	escape,
-	unescape,
-	eval,
-  Function,
-  console,
-	setTimeout,
-	clearTimeout,
-	setInterval,
-	clearInterval,
-	requestAnimationFrame,
-	cancelAnimationFrame,
-```
-
-> 内置类型和当前运行 JavaScript 环境相关，如环境本身不支持则不支持！
-
-导入自定义方法或类型示例：
-
-```ts
-import TaroScript, { globalContext } from "taro-script";
-
-globalContext.hello = function(){
-  console.log('hello taro-script')
-}
-
-<TaroScript text="hello()"></TaroScript>;
-```
-
-或自定义上下文
-
-```ts
-import TaroScript from "taro-script";
-
-const ctx = {
-  hello(){
-    console.log('hello taro-script')
-  }
-}
-
-<TaroScript context={ctx} text="hello()"></TaroScript>;
-
+declare function useScriptContext<T = Record<any, any>>(): T;
 ```
