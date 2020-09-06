@@ -1,3 +1,5 @@
+![TaroScript](https://img30.360buyimg.com/ling/jfs/t1/136920/10/9204/15335/5f543153Efeede6a9/5224a411b9d274f2.jpg)
+
 # taro-script
 
 **For Taro v3**：支持多端小程序动态加载远程 JavaScript 脚本并执行，**支持 ES5 语法**
@@ -185,6 +187,8 @@ const value = evalScript("100+200"); // 300
 ## 其他
 
 - 该组件使用[eval5](https://github.com/bplok20010/eval5)来解析`JavaScript`语法，支持 `ES5`
+
+- 生产环境前别忘记给需要加载的地址配置合法域名
 
 - TaroScript 内置类型及方法：
 
