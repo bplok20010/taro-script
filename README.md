@@ -188,7 +188,7 @@ const value = evalScript("100+200"); // 300
 
 - 该组件使用[eval5](https://github.com/bplok20010/eval5)来解析`JavaScript`语法，支持 `ES5`
 
-- 生产环境前别忘记给需要加载的地址配置合法域名
+- **上生产环境前别忘记给需要加载的地址配置合法域名**
 
 - TaroScript 内置类型及方法：
 
