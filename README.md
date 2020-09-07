@@ -37,9 +37,9 @@ function App({ url }) {
 
 ```tsx
 // 并行加载及无序执行
-<TaroScript  src="path1" />
-<TaroScript  src="path2" />
-<TaroScript  src="path3" />
+<TaroScript  src="url1" />
+<TaroScript  src="url2" />
+<TaroScript  src="url3" />
 ```
 
 **如需要确保执行顺序，应该使用数组或嵌套，例如：**
@@ -47,15 +47,15 @@ function App({ url }) {
 **数组方式(建议)**
 
 ```tsx
-<TaroScript src={["path1", "path2", "path3"]} />
+<TaroScript src={["url1", "url2", "url3"]} />
 ```
 
 或 嵌套方式
 
 ```tsx
-<TaroScript src="path1">
-	<TaroScript src="path2">
-		<TaroScript src="path3"></TaroScript>
+<TaroScript src="url1">
+	<TaroScript src="url2">
+		<TaroScript src="url3"></TaroScript>
 	</TaroScript>
 </TaroScript>
 ```
