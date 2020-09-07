@@ -155,7 +155,7 @@ const app = getApp();
 
   类型：`React.ReactNode | ((context: T) => React.ReactNode)`
 
-  加载完成后显示的内容，支持传入`函数`第一个参数为脚本执行的`作用域`
+  加载完成后显示的内容，支持传入`函数`第一个参数为脚本执行的`上下文`
 
 ## `useScriptContext()`
 
