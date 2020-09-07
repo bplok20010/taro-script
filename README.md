@@ -55,7 +55,7 @@ function App({ url }) {
 ```tsx
 <TaroScript src="url1">
 	<TaroScript src="url2">
-		<TaroScript src="url3"></TaroScript>
+		<TaroScript src="url3">执行结束</TaroScript>
 	</TaroScript>
 </TaroScript>
 ```
