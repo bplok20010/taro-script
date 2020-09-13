@@ -1,5 +1,5 @@
 import { Interpreter } from "eval5";
-import { request, requestOptions } from "./adapter";
+import { request, requestOptions, SuccessCallbackResult } from "./adapter";
 
 const loadCachedScript: Record<string, string> = Object.create(null);
 
@@ -41,7 +41,7 @@ export function loadScript(requestOpts: requestOptions, useCache = true) {
 
 		request(
 			Object.assign({}, requestOpts, {
-				success(res: request.SuccessCallbackResult<string>) {
+				success(res: SuccessCallbackResult) {
 					resolve((loadCachedScript[url] = res.data));
 				},
 				fail(err: { errMsg: string }) {

@@ -2,4 +2,10 @@ import { request } from "@tarojs/taro";
 
 type requestOptions = request.Option;
 
-export { request, requestOptions };
+type SuccessCallbackResult = request.SuccessCallbackResult<string>;
+
+interface FailCallbackResult {
+	errMsg: string;
+}
+
+export { request, requestOptions, SuccessCallbackResult, FailCallbackResult };
