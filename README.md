@@ -113,18 +113,6 @@ const app = getApp();
 
   设置每个远程脚本加载超时时间
 
-- ### `onExecSuccess`
-
-  类型：`()=> void`
-
-  脚本执行成功后回调
-
-- ### `onExecError`
-
-  类型：`(err:Error)=> void`
-
-  脚本执行错误后回调
-
 - ### `onLoad`
 
   类型：`() => void`
@@ -273,8 +261,6 @@ interface TaroScriptProps<T = Record<any, any>> {
 	onLoad?: () => void;
 	/** 脚本加载失败后回调 */
 	onError?: (err: Error) => void;
-	onExecSuccess?: () => void;
-	onExecError?: (err: Error) => void;
 	/** 加载脚本超时时间 */
 	timeout?: number;
 	/** 脚本加载中显示内容 */

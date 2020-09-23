@@ -23,8 +23,6 @@ export interface TaroScriptProps<T = Record<any, any>> {
 	onLoad?: () => void;
 	/** 脚本加载失败后回调 */
 	onError?: (err: Error) => void;
-	onExecSuccess?: () => void;
-	onExecError?: (err: Error) => void;
 	/** 加载脚本超时时间 */
 	timeout?: number;
 	/** 脚本加载中显示内容 */
@@ -48,20 +46,20 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 
 	React.useEffect(() => {
 		const context = contextRef.current;
-		const { src, timeout, onLoad, onError, onExecError, onExecSuccess, cache, text } = props;
+		const { src, timeout, onLoad, onError, cache, text } = props;
 
 		if (text) {
 			try {
 				evalScript(text, context);
 
-				if (onExecSuccess) {
-					onExecSuccess();
+				if (onLoad) {
+					onLoad();
 				}
 
 				setLoadStatus(COMPLETED);
 			} catch (e) {
-				if (onExecError) {
-					onExecError(e);
+				if (onError) {
+					onError(e);
 				}
 			}
 			return;
@@ -95,16 +93,9 @@ export function TaroScript<T = Record<any, any>>(props: TaroScriptProps<T>) {
 					});
 				} catch (e) {
 					execErr = e;
-					if (onExecError) {
-						onExecError(e);
-					}
 				}
 
 				if (!execErr) {
-					if (onExecSuccess) {
-						onExecSuccess();
-					}
-
 					if (onLoad) {
 						onLoad();
 					}

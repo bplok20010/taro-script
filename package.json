@@ -1,6 +1,6 @@
 {
 	"name": "taro-script",
-	"version": "0.4.1",
+	"version": "1.0.0-beta1",
 	"description": "For Taro v3：支持多端小程序动态加载远程 JavaScript 脚本并执行",
 	"main": "cjs/index.js",
 	"module": "esm/index.js",
@@ -22,8 +22,8 @@
 	},
 	"dependencies": {
 		"@tarojs/taro": "^3.0.9",
-		"react": "^16.13.1",
-		"eval5": "^1.4.5"
+		"eval5": "^1.4.6",
+		"react": "^16.13.1"
 	},
 	"devDependencies": {
 		"@types/enzyme": "^3.10.5",
