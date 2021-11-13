@@ -1,6 +1,6 @@
 {
 	"name": "taro-script",
-	"version": "1.0.0-beta1",
+	"version": "1.0.0",
 	"description": "For Taro v3：支持多端小程序动态加载远程 JavaScript 脚本并执行",
 	"main": "cjs/index.js",
 	"module": "esm/index.js",
@@ -18,14 +18,18 @@
 		"tsc": "tsc",
 		"test": "jest",
 		"clear": "rimraf lib cjs esm docs dist",
-		"build": "run-s clear tsc cjs esm"
+		"build": "run-s clear tsc cjs esm",
+		"prepublishOnly": "run-s build"
 	},
 	"dependencies": {
-		"@tarojs/taro": "^3.0.9",
-		"eval5": "^1.4.6",
+		"eval5": "^1.4.7"
+	},
+	"peerDependencies": {
+		"@tarojs/taro": "^3.1.0",
 		"react": "^16.13.1"
 	},
 	"devDependencies": {
+		"@tarojs/taro": "^3.3.14",
 		"@types/enzyme": "^3.10.5",
 		"@types/enzyme-adapter-react-16": "^1.0.6",
 		"@types/react": "^16.9.34",
