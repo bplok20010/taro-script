@@ -1,8 +1,8 @@
 import { request } from "@tarojs/taro";
 
-type requestOptions = request.Option;
+type requestOptions = any; //request.Option;
 
-type SuccessCallbackResult = request.SuccessCallbackResult<string>;
+type SuccessCallbackResult = any; //request.SuccessCallbackResult<string>;
 
 interface FailCallbackResult {
 	errMsg: string;
